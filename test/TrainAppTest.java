@@ -1,61 +1,83 @@
 import org.junit.jupiter.api.Test;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TrainAppUC12Test {
+class TrainAppUC13Test {
 
-    private boolean validate(List<GoodsBogie> bogies) {
-        return bogies.stream()
-                .allMatch(b ->
-                        !b.type.equalsIgnoreCase("Cylindrical") ||
-                                b.cargo.equalsIgnoreCase("Petroleum")
-                );
+    private List<Bogie> getBogies(int size) {
+        List<Bogie> list = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            list.add(new Bogie("B" + i, i % 100));
+        }
+        return list;
     }
 
     @Test
-    void testSafety_AllBogiesValid() {
-        List<GoodsBogie> list = Arrays.asList(
-                new GoodsBogie("Cylindrical", "Petroleum"),
-                new GoodsBogie("Open", "Coal")
-        );
+    void testLoopFilteringLogic() {
+        List<Bogie> bogies = getBogies(100);
 
-        assertTrue(validate(list));
+        List<Bogie> result = new ArrayList<>();
+        for (Bogie b : bogies) {
+            if (b.capacity > 60) {
+                result.add(b);
+            }
+        }
+
+        assertTrue(result.stream().allMatch(b -> b.capacity > 60));
     }
 
     @Test
-    void testSafety_CylindricalWithInvalidCargo() {
-        List<GoodsBogie> list = Arrays.asList(
-                new GoodsBogie("Cylindrical", "Coal")
-        );
+    void testStreamFilteringLogic() {
+        List<Bogie> bogies = getBogies(100);
 
-        assertFalse(validate(list));
+        List<Bogie> result = bogies.stream()
+                .filter(b -> b.capacity > 60)
+                .collect(Collectors.toList());
+
+        assertTrue(result.stream().allMatch(b -> b.capacity > 60));
     }
 
     @Test
-    void testSafety_NonCylindricalBogiesAllowed() {
-        List<GoodsBogie> list = Arrays.asList(
-                new GoodsBogie("Open", "Coal"),
-                new GoodsBogie("Box", "Grain")
-        );
+    void testLoopAndStreamResultsMatch() {
+        List<Bogie> bogies = getBogies(100);
 
-        assertTrue(validate(list));
+        List<Bogie> loopResult = new ArrayList<>();
+        for (Bogie b : bogies) {
+            if (b.capacity > 60) {
+                loopResult.add(b);
+            }
+        }
+
+        List<Bogie> streamResult = bogies.stream()
+                .filter(b -> b.capacity > 60)
+                .collect(Collectors.toList());
+
+        assertEquals(loopResult.size(), streamResult.size());
     }
 
     @Test
-    void testSafety_MixedBogiesWithViolation() {
-        List<GoodsBogie> list = Arrays.asList(
-                new GoodsBogie("Cylindrical", "Petroleum"),
-                new GoodsBogie("Cylindrical", "Coal") // violation
-        );
+    void testExecutionTimeMeasurement() {
+        long start = System.nanoTime();
 
-        assertFalse(validate(list));
+        int sum = 0;
+        for (int i = 0; i < 1000; i++) sum += i;
+
+        long end = System.nanoTime();
+
+        assertTrue((end - start) > 0);
     }
 
     @Test
-    void testSafety_EmptyBogieList() {
-        List<GoodsBogie> list = new ArrayList<>();
+    void testLargeDatasetProcessing() {
+        List<Bogie> bogies = getBogies(100000);
 
-        assertTrue(validate(list)); // no violations
+        List<Bogie> result = bogies.stream()
+                .filter(b -> b.capacity > 60)
+                .collect(Collectors.toList());
+
+        assertNotNull(result);
+        assertTrue(result.size() > 0);
     }
 }
