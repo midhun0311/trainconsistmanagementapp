@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/tarinconsist/tarinconsist.iml" filepath="$PROJECT_DIR$/tarinconsist/tarinconsist.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/trainconsistmanagementapp.iml" filepath="$PROJECT_DIR$/.idea/trainconsistmanagementapp.iml" />
+    </modules>
+  </component>
+</project>
