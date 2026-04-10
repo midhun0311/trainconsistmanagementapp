@@ -1,48 +1,57 @@
-import java.util.ArrayList;
-import java.util.List;
+import org.junit.jupiter.api.Test;
+import java.util.regex.Pattern;
 
-// Bogie class
-class Bogie {
-    String name;
-    int capacity;
+import static org.junit.jupiter.api.Assertions.*;
 
-    Bogie(String name, int capacity) {
-        this.name = name;
-        this.capacity = capacity;
+class TrainAppUC11Test {
+
+    private final Pattern trainPattern = Pattern.compile("TRN-\\d{4}");
+    private final Pattern cargoPattern = Pattern.compile("PET-[A-Z]{2}");
+
+    @Test
+    void testRegex_ValidTrainID() {
+        assertTrue(trainPattern.matcher("TRN-1234").matches());
     }
 
-    public String toString() {
-        return name + " -> " + capacity;
+    @Test
+    void testRegex_InvalidTrainIDFormat() {
+        assertFalse(trainPattern.matcher("TRAIN12").matches());
+        assertFalse(trainPattern.matcher("TRN12A").matches());
+        assertFalse(trainPattern.matcher("1234-TRN").matches());
     }
-}
 
-public class TrainApp {
+    @Test
+    void testRegex_ValidCargoCode() {
+        assertTrue(cargoPattern.matcher("PET-AB").matches());
+    }
 
-    public static void main(String[] args) {
+    @Test
+    void testRegex_InvalidCargoCodeFormat() {
+        assertFalse(cargoPattern.matcher("PET-ab").matches());
+        assertFalse(cargoPattern.matcher("PET123").matches());
+        assertFalse(cargoPattern.matcher("AB-PET").matches());
+    }
 
-        System.out.println("=== Train Consist Management App ===");
+    @Test
+    void testRegex_TrainIDDigitLengthValidation() {
+        assertFalse(trainPattern.matcher("TRN-123").matches());
+        assertFalse(trainPattern.matcher("TRN-12345").matches());
+    }
 
-        // Create list of bogies
-        List<Bogie> bogies = new ArrayList<>();
+    @Test
+    void testRegex_CargoCodeUppercaseValidation() {
+        assertFalse(cargoPattern.matcher("PET-ab").matches());
+    }
 
-        bogies.add(new Bogie("Sleeper", 72));
-        bogies.add(new Bogie("AC Chair", 56));
-        bogies.add(new Bogie("First Class", 24));
+    @Test
+    void testRegex_EmptyInputHandling() {
+        assertFalse(trainPattern.matcher("").matches());
+        assertFalse(cargoPattern.matcher("").matches());
+    }
 
-        // Display bogies
-        System.out.println("\nBogies:");
-        System.out.println(bogies);
-
-        // Calculate total seating capacity
-        int totalSeats = bogies.stream()
-                .map(b -> b.capacity)          // extract capacity
-                .reduce(0, Integer::sum);      // sum all values
-
-        // Display result
-        System.out.println("\nTotal Seating Capacity: " + totalSeats);
-
-        // Verify original list unchanged
-        System.out.println("\nOriginal list after calculation:");
-        System.out.println(bogies);
+    @Test
+    void testRegex_ExactPatternMatch() {
+        assertFalse(trainPattern.matcher("TRN-1234X").matches());
+        assertFalse(cargoPattern.matcher("PET-ABC").matches());
     }
 }
